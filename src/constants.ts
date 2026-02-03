@@ -1,5 +1,62 @@
 import { School, Student, Route, Professor, EnrollmentApplication, EnrollmentStatus, CalendarEvent, LessonPlan, Assessment } from './types';
 
+// ==================== CONFIGURAÇÃO WHITE LABEL ====================
+export interface TenantConfig {
+  id: string;
+  name: string;
+  logoUrl?: string;
+  colors: {
+    primary: string;      // HSL values: "45 93% 52%"
+    dark: string;
+    secondary: string;
+    accent: string;
+    light: string;
+    success: string;
+    danger: string;
+    warning: string;
+    info: string;
+    muted: string;
+  };
+}
+
+// Configuração padrão do tenant (pode ser sobrescrita pela Diretoria)
+export const DEFAULT_TENANT_CONFIG: TenantConfig = {
+  id: 'default',
+  name: 'EduX',
+  logoUrl: '',
+  colors: {
+    primary: '45 93% 52%',
+    dark: '240 17% 14%',
+    secondary: '220 14% 40%',
+    accent: '220 90% 56%',
+    light: '220 14% 96%',
+    success: '160 84% 39%',
+    danger: '0 84% 60%',
+    warning: '38 92% 50%',
+    info: '217 91% 60%',
+    muted: '220 9% 46%',
+  },
+};
+
+// Função para aplicar configuração de tenant via CSS
+export const applyTenantConfig = (config: TenantConfig) => {
+  const root = document.documentElement;
+  root.style.setProperty('--brand-primary', config.colors.primary);
+  root.style.setProperty('--brand-dark', config.colors.dark);
+  root.style.setProperty('--brand-secondary', config.colors.secondary);
+  root.style.setProperty('--brand-accent', config.colors.accent);
+  root.style.setProperty('--brand-light', config.colors.light);
+  root.style.setProperty('--brand-success', config.colors.success);
+  root.style.setProperty('--brand-danger', config.colors.danger);
+  root.style.setProperty('--brand-warning', config.colors.warning);
+  root.style.setProperty('--brand-info', config.colors.info);
+  root.style.setProperty('--brand-muted', config.colors.muted);
+  if (config.logoUrl) {
+    root.style.setProperty('--brand-logo-url', `url(${config.logoUrl})`);
+  }
+};
+
+// ==================== DADOS MOCK ====================
 export const MOCK_SCHOOLS: School[] = [
   { id: 'escola-01', name: 'EMEF Prof. Maria Silva', students: 420, maxCapacity: 500, address: 'Rua das Flores, 123 - Centro', levels: ['Fundamental I', 'Fundamental II'], isEnrollmentOpen: true },
   { id: 'escola-02', name: 'EMEI Pequenos Sonhos', students: 180, maxCapacity: 200, address: 'Av. Brasil, 456 - Jardim Primavera', levels: ['Infantil'], isEnrollmentOpen: false },

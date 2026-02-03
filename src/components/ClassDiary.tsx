@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, UserRole, DiaryEntry } from '../types';
 import { MOCK_SCHOOLS, SUBJECTS_LIST } from '../constants';
+import { ClipboardList, PenLine, Save, CalendarDays, BookOpen, Users, CheckCircle, Calendar } from 'lucide-react';
 
 interface ClassDiaryProps {
   currentUser: User;
@@ -52,7 +53,7 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-black text-brand-dark tracking-tight">Diário de Classe</h1>
-          <p className="text-brand-gray mt-1">Registre o conteúdo das aulas e frequência</p>
+          <p className="text-brand-muted mt-1">Registre o conteúdo das aulas e frequência</p>
         </div>
       </div>
 
@@ -60,20 +61,20 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
       <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Data</label>
+            <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Data</label>
             <input
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
+              className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark font-medium focus:outline-none focus:border-brand-primary transition-all"
             />
           </div>
           <div>
-            <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Turma</label>
+            <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Turma</label>
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
+              className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark font-medium focus:outline-none focus:border-brand-primary transition-all"
             >
               {MOCK_CLASSES.map((cls) => (
                 <option key={cls} value={cls}>{cls}</option>
@@ -81,11 +82,11 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Disciplina</label>
+            <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Disciplina</label>
             <select
               value={selectedSubject}
               onChange={(e) => setSelectedSubject(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
+              className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark font-medium focus:outline-none focus:border-brand-primary transition-all"
             >
               {SUBJECTS_LIST.map((sub) => (
                 <option key={sub} value={sub}>{sub}</option>
@@ -93,8 +94,9 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
             </select>
           </div>
           <div className="flex items-end">
-            <button className="w-full px-6 py-3 bg-brand-info text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-blue-600 transition-all">
-              📋 Chamada
+            <button className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-info text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-blue-600 transition-all">
+              <ClipboardList size={16} />
+              Chamada
             </button>
           </div>
         </div>
@@ -104,55 +106,58 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
         {/* New Entry Form */}
         <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
           <h2 className="text-xl font-black text-brand-dark mb-6 flex items-center gap-3">
-            <span className="w-10 h-10 bg-brand-yellow rounded-xl flex items-center justify-center">📝</span>
+            <span className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center">
+              <PenLine size={20} className="text-brand-dark" />
+            </span>
             Novo Registro
           </h2>
           
           <div className="space-y-6">
             <div>
-              <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">
+              <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">
                 Conteúdo da Aula *
               </label>
               <textarea
                 value={newEntry.content}
                 onChange={(e) => setNewEntry({ ...newEntry, content: e.target.value })}
                 rows={4}
-                className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark focus:outline-none focus:border-brand-yellow transition-all resize-none"
+                className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark focus:outline-none focus:border-brand-primary transition-all resize-none"
                 placeholder="Descreva o conteúdo trabalhado na aula..."
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">
+              <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">
                 Objetivos de Aprendizagem
               </label>
               <textarea
                 value={newEntry.objectives}
                 onChange={(e) => setNewEntry({ ...newEntry, objectives: e.target.value })}
                 rows={2}
-                className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark focus:outline-none focus:border-brand-yellow transition-all resize-none"
+                className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark focus:outline-none focus:border-brand-primary transition-all resize-none"
                 placeholder="Quais objetivos foram trabalhados?"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">
+              <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">
                 Recursos Utilizados
               </label>
               <input
                 type="text"
                 value={newEntry.resources}
                 onChange={(e) => setNewEntry({ ...newEntry, resources: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark focus:outline-none focus:border-brand-yellow transition-all"
+                className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl text-brand-dark focus:outline-none focus:border-brand-primary transition-all"
                 placeholder="Livro didático, projetor, etc."
               />
             </div>
 
             <button
               onClick={handleSaveEntry}
-              className="w-full px-6 py-4 bg-brand-dark text-white rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-brand-dark/20"
+              className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-brand-dark text-white rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-brand-dark/20"
             >
-              💾 Salvar Registro
+              <Save size={16} />
+              Salvar Registro
             </button>
           </div>
         </div>
@@ -160,15 +165,19 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
         {/* Today's Entries */}
         <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
           <h2 className="text-xl font-black text-brand-dark mb-6 flex items-center gap-3">
-            <span className="w-10 h-10 bg-brand-success/10 rounded-xl flex items-center justify-center text-brand-success">📅</span>
+            <span className="w-10 h-10 bg-brand-success/10 rounded-xl flex items-center justify-center">
+              <CalendarDays size={20} className="text-brand-success" />
+            </span>
             Registros do Dia
           </h2>
 
           {todayEntries.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-6xl mb-4">📓</p>
-              <p className="text-brand-gray text-lg">Nenhum registro para esta data</p>
-              <p className="text-brand-gray text-sm mt-1">Crie um novo registro ao lado</p>
+              <div className="w-20 h-20 bg-brand-muted/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <BookOpen size={40} className="text-brand-muted" />
+              </div>
+              <p className="text-brand-muted text-lg">Nenhum registro para esta data</p>
+              <p className="text-brand-muted text-sm mt-1">Crie um novo registro ao lado</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -186,7 +195,7 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
                   </div>
                   <p className="text-brand-dark font-medium">{entry.content}</p>
                   {entry.objectives && (
-                    <p className="text-brand-gray text-sm mt-2">
+                    <p className="text-brand-muted text-sm mt-2">
                       <strong>Objetivos:</strong> {entry.objectives}
                     </p>
                   )}
@@ -200,17 +209,19 @@ const ClassDiary: React.FC<ClassDiaryProps> = ({ currentUser, selectedSchoolId }
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Aulas Registradas', value: entries.length.toString(), icon: '📚' },
-          { label: 'Turmas Atendidas', value: '5', icon: '👥' },
-          { label: 'Frequência Média', value: '94%', icon: '✅' },
-          { label: 'Dias Letivos', value: '120', icon: '📅' },
+          { label: 'Aulas Registradas', value: entries.length.toString(), icon: BookOpen, color: 'bg-brand-info' },
+          { label: 'Turmas Atendidas', value: '5', icon: Users, color: 'bg-brand-warning' },
+          { label: 'Frequência Média', value: '94%', icon: CheckCircle, color: 'bg-brand-success' },
+          { label: 'Dias Letivos', value: '120', icon: Calendar, color: 'bg-brand-primary' },
         ].map((stat, i) => (
           <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center gap-3">
-              <span className="text-3xl">{stat.icon}</span>
+              <div className={`w-12 h-12 ${stat.color}/20 rounded-xl flex items-center justify-center`}>
+                <stat.icon size={24} className={stat.color.replace('bg-', 'text-')} />
+              </div>
               <div>
                 <p className="text-2xl font-black text-brand-dark">{stat.value}</p>
-                <p className="text-brand-gray text-xs font-bold uppercase tracking-widest">{stat.label}</p>
+                <p className="text-brand-muted text-xs font-bold uppercase tracking-widest">{stat.label}</p>
               </div>
             </div>
           </div>
