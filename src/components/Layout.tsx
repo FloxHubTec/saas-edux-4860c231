@@ -228,7 +228,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
 
       {/* Conteúdo Principal */}
       <main className={`flex-1 ${!isMobile ? (sidebarOpen ? 'ml-72' : 'ml-20') : ''} transition-all duration-300`}>
-        {/* Header Mobile */}
+        {/* Header Mobile com Nome da Escola */}
         {isMobile && (
           <header className="bg-brand-dark text-white p-4 flex items-center justify-between sticky top-0 z-30">
             <button
@@ -237,11 +237,29 @@ const Layout: React.FC<LayoutProps> = ({ children, activeTab, setActiveTab, user
             >
               <Menu size={24} />
             </button>
-            <div className="flex items-center gap-2">
-              <Building2 size={20} className="text-brand-primary" />
-              <span className="font-bold">EduX</span>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-2">
+                <Building2 size={18} className="text-brand-primary" />
+                <span className="font-bold text-sm">EduX</span>
+              </div>
+              {currentSchool && (
+                <span className="text-[10px] text-brand-primary truncate max-w-[180px]">
+                  {currentSchool.name}
+                </span>
+              )}
             </div>
             <div className="w-10" />
+          </header>
+        )}
+        
+        {/* Header Desktop com Nome da Escola */}
+        {!isMobile && currentSchool && (
+          <header className="bg-white border-b border-gray-100 px-8 py-3 flex items-center gap-3">
+            <Building2 size={18} className="text-brand-primary" />
+            <span className="font-bold text-brand-dark">{currentSchool.name}</span>
+            <span className="text-xs text-brand-muted px-2 py-1 bg-brand-light rounded-full">
+              Unidade Ativa
+            </span>
           </header>
         )}
         
