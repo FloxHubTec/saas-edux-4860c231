@@ -10,20 +10,25 @@
     <meta property="og:description" content="Sistema Integrado de Gestão Educacional Municipal" />
     <meta property="og:type" content="website" />
     <link rel="icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              'brand-dark': '#1A1A2E',
-              'brand-yellow': '#F5C518',
-              'brand-gray': '#6B7280',
-              'brand-light': '#F9FAFB',
-              'brand-success': '#10B981',
-              'brand-danger': '#EF4444',
-              'brand-warning': '#F59E0B',
-              'brand-info': '#3B82F6',
+              'brand-dark': 'hsl(var(--brand-dark))',
+              'brand-primary': 'hsl(var(--brand-primary))',
+              'brand-secondary': 'hsl(var(--brand-secondary))',
+              'brand-accent': 'hsl(var(--brand-accent))',
+              'brand-light': 'hsl(var(--brand-light))',
+              'brand-success': 'hsl(var(--brand-success))',
+              'brand-danger': 'hsl(var(--brand-danger))',
+              'brand-warning': 'hsl(var(--brand-warning))',
+              'brand-info': 'hsl(var(--brand-info))',
+              'brand-muted': 'hsl(var(--brand-muted))',
             },
             fontFamily: {
               sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -31,6 +36,7 @@
             animation: {
               'fade-in': 'fadeIn 0.3s ease-out',
               'slide-up': 'slideUp 0.3s ease-out',
+              'slide-in-left': 'slideInLeft 0.3s ease-out',
             },
             keyframes: {
               fadeIn: {
@@ -41,13 +47,32 @@
                 '0%': { opacity: '0', transform: 'translateY(10px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
               },
+              slideInLeft: {
+                '0%': { opacity: '0', transform: 'translateX(-20px)' },
+                '100%': { opacity: '1', transform: 'translateX(0)' },
+              },
             },
           },
         },
       }
     </script>
     <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+      :root {
+        /* White Label - Cores Padrão (podem ser alteradas pela Diretoria) */
+        --brand-dark: 240 17% 14%;
+        --brand-primary: 45 93% 52%;
+        --brand-secondary: 220 14% 40%;
+        --brand-accent: 220 90% 56%;
+        --brand-light: 220 14% 96%;
+        --brand-success: 160 84% 39%;
+        --brand-danger: 0 84% 60%;
+        --brand-warning: 38 92% 50%;
+        --brand-info: 217 91% 60%;
+        --brand-muted: 220 9% 46%;
+        
+        /* Logo URL (pode ser alterada pela Diretoria) */
+        --brand-logo-url: '';
+      }
       
       * {
         font-family: 'Inter', system-ui, sans-serif;
@@ -59,17 +84,17 @@
       }
       
       ::-webkit-scrollbar-track {
-        background: #f1f1f1;
+        background: hsl(var(--brand-light));
         border-radius: 4px;
       }
       
       ::-webkit-scrollbar-thumb {
-        background: #c4c4c4;
+        background: hsl(var(--brand-muted) / 0.5);
         border-radius: 4px;
       }
       
       ::-webkit-scrollbar-thumb:hover {
-        background: #a8a8a8;
+        background: hsl(var(--brand-muted) / 0.7);
       }
     </style>
   </head>

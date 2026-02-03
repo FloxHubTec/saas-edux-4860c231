@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MOCK_SCHOOLS } from '../constants';
 import { Student } from '../types';
+import { Lock, Unlock, Printer, GraduationCap } from 'lucide-react';
 
 interface StudentPortalProps {
   currentStudent: Student;
@@ -11,7 +12,6 @@ const StudentPortal: React.FC<StudentPortalProps> = ({ currentStudent }) => {
   const currentSchool = MOCK_SCHOOLS.find(s => s.id === currentStudent.schoolId);
   const schoolName = currentSchool?.name || "Rede Municipal";
   const isEnrollmentOpen = currentSchool?.isEnrollmentOpen || false;
-  const year = "2024";
 
   const subjects = Object.entries(currentStudent.academicRecords).map(([name, data]) => {
     const gradesArr = [data.grades[1], data.grades[2], data.grades[3], data.grades[4]];
@@ -26,44 +26,51 @@ const StudentPortal: React.FC<StudentPortalProps> = ({ currentStudent }) => {
 
   return (
     <div className="space-y-8 animate-fade-in pb-20">
-      <div className={`p-8 rounded-[3rem] border-4 transition-all ${isEnrollmentOpen ? 'bg-brand-yellow/10 border-brand-yellow shadow-xl' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
+      {/* Banner de Rematrícula */}
+      <div className={`p-8 rounded-[3rem] border-4 transition-all ${isEnrollmentOpen ? 'bg-brand-primary/10 border-brand-primary shadow-xl' : 'bg-gray-50 border-gray-100 opacity-60'}`}>
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-6">
-            <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-3xl shadow-lg ${isEnrollmentOpen ? 'bg-brand-yellow text-brand-dark' : 'bg-gray-200 text-gray-400'}`}>
-              {isEnrollmentOpen ? '🔓' : '🔒'}
+            <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-lg ${isEnrollmentOpen ? 'bg-brand-primary text-brand-dark' : 'bg-gray-200 text-gray-400'}`}>
+              {isEnrollmentOpen ? <Unlock size={32} /> : <Lock size={32} />}
             </div>
             <div>
               <h3 className="text-2xl font-black text-brand-dark tracking-tighter">Renovação de Matrícula 2025</h3>
-              <p className="font-bold text-sm text-brand-gray mt-1">
+              <p className="font-bold text-sm text-brand-muted mt-1">
                 {isEnrollmentOpen ? 'O período de rematrícula online está disponível!' : 'Aguardando liberação pela secretaria escolar.'}
               </p>
             </div>
           </div>
           <button disabled={!isEnrollmentOpen} className={`px-10 py-5 rounded-2xl font-black uppercase tracking-widest text-xs transition-all shadow-xl ${isEnrollmentOpen ? 'bg-brand-dark text-white hover:scale-105' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}>
-            {isEnrollmentOpen ? 'Iniciar Rematrícula →' : 'Bloqueado'}
+            {isEnrollmentOpen ? 'Iniciar Rematrícula' : 'Bloqueado'}
           </button>
         </div>
       </div>
 
+      {/* Cabeçalho do Aluno */}
       <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-center gap-4">
-          <img src={currentStudent.photo} className="w-16 h-16 rounded-2xl border-2 border-brand-yellow object-cover shadow-lg" alt="" />
+          <img src={currentStudent.photo} className="w-16 h-16 rounded-2xl border-2 border-brand-primary object-cover shadow-lg" alt="" />
           <div>
             <h3 className="text-xl font-black text-brand-dark">{currentStudent.name}</h3>
-            <p className="text-brand-gray font-bold text-sm uppercase tracking-widest">{schoolName}</p>
+            <p className="text-brand-muted font-bold text-sm uppercase tracking-widest">{schoolName}</p>
           </div>
         </div>
-        <button onClick={handlePrint} className="bg-brand-dark text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest">🖨️ Imprimir Boletim</button>
+        <button onClick={handlePrint} className="flex items-center gap-2 bg-brand-dark text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest">
+          <Printer size={16} />
+          Imprimir Boletim
+        </button>
       </div>
 
+      {/* Filtro de Bimestre */}
       <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex flex-wrap gap-2">
         {[{ id: 'ALL', label: 'Anual' }, { id: 1, label: '1º Bim' }, { id: 2, label: '2º Bim' }, { id: 3, label: '3º Bim' }, { id: 4, label: '4º Bim' }].map((btn) => (
-          <button key={btn.id} onClick={() => setActiveBimester(btn.id as any)} className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeBimester === btn.id ? 'bg-brand-yellow text-brand-dark shadow-lg' : 'bg-gray-50 text-brand-gray hover:bg-gray-100'}`}>
+          <button key={btn.id} onClick={() => setActiveBimester(btn.id as any)} className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeBimester === btn.id ? 'bg-brand-primary text-brand-dark shadow-lg' : 'bg-gray-50 text-brand-muted hover:bg-gray-100'}`}>
             {btn.label}
           </button>
         ))}
       </div>
 
+      {/* Tabela de Notas */}
       <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-100 overflow-x-auto">
         <table className="w-full text-center border-collapse">
           <thead>
@@ -79,8 +86,8 @@ const StudentPortal: React.FC<StudentPortalProps> = ({ currentStudent }) => {
             {subjects.map((sub, i) => (
               <tr key={i} className="hover:bg-gray-50 transition-colors">
                 <td className="p-4 text-left font-black text-brand-dark text-xs">{sub.name}</td>
-                {activeBimester === 'ALL' ? sub.grades.map((g, idx) => <td key={idx} className="p-4 text-xs font-bold text-brand-gray">{g !== null ? g.toFixed(1) : '-'}</td>) : <td className="p-4 text-sm font-black text-brand-dark">{sub.grades[(activeBimester as number) - 1]?.toFixed(1) || '-'}</td>}
-                {activeBimester === 'ALL' ? sub.absences.map((a, idx) => <td key={idx} className="p-4 text-xs font-bold text-brand-gray">{a ?? '-'}</td>) : <td className="p-4 text-sm font-black text-brand-dark">{sub.absences[(activeBimester as number) - 1] ?? '-'}</td>}
+                {activeBimester === 'ALL' ? sub.grades.map((g, idx) => <td key={idx} className="p-4 text-xs font-bold text-brand-muted">{g !== null ? g.toFixed(1) : '-'}</td>) : <td className="p-4 text-sm font-black text-brand-dark">{sub.grades[(activeBimester as number) - 1]?.toFixed(1) || '-'}</td>}
+                {activeBimester === 'ALL' ? sub.absences.map((a, idx) => <td key={idx} className="p-4 text-xs font-bold text-brand-muted">{a ?? '-'}</td>) : <td className="p-4 text-sm font-black text-brand-dark">{sub.absences[(activeBimester as number) - 1] ?? '-'}</td>}
                 <td className={`p-4 font-black text-sm ${sub.avg >= 7 ? 'text-brand-success' : 'text-brand-danger'}`}>{sub.avg.toFixed(1)}</td>
                 <td className="p-4"><span className="px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest bg-brand-success/10 text-brand-success">{sub.final}</span></td>
               </tr>

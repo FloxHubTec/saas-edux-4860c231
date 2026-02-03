@@ -1,9 +1,22 @@
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  SECRETARY = 'SECRETARY',
+  SUPER_ADM = 'SUPER_ADM',
+  DIRETORIA = 'DIRETORIA',
+  COORDENADOR = 'COORDENADOR',
   PROFESSOR = 'PROFESSOR',
-  STUDENT = 'STUDENT',
+  SECRETARIO = 'SECRETARIO',
+  ALUNO = 'ALUNO',
+  RESPONSAVEL = 'RESPONSAVEL',
 }
+
+export const UserRoleLabels: Record<UserRole, string> = {
+  [UserRole.SUPER_ADM]: 'Super ADM',
+  [UserRole.DIRETORIA]: 'Diretoria',
+  [UserRole.COORDENADOR]: 'Coordenador Pedagógico',
+  [UserRole.PROFESSOR]: 'Professor',
+  [UserRole.SECRETARIO]: 'Secretário',
+  [UserRole.ALUNO]: 'Aluno',
+  [UserRole.RESPONSAVEL]: 'Responsável',
+};
 
 export interface User {
   id: string;
