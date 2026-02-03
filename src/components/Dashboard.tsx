@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { User, UserRole, Student } from '../types';
-import { MOCK_SCHOOLS, MOCK_STUDENTS, MOCK_ENROLLMENTS, MOCK_ROUTES } from '../constants';
+import React from 'react';
+import { User, UserRole, UserRoleLabels } from '../types';
+import { MOCK_SCHOOLS, MOCK_ENROLLMENTS, MOCK_ROUTES } from '../constants';
 import SchoolSelector from './SchoolSelector';
+import { Users, FileText, Building2, Bus, PlusCircle, BarChart3, Calendar, Shield } from 'lucide-react';
 
 interface DashboardProps {
   onNavigate: (tab: string) => void;
@@ -27,7 +28,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
     { 
       title: 'Total de Alunos', 
       value: totalStudents.toLocaleString('pt-BR'), 
-      icon: '👨‍🎓', 
+      icon: <Users size={24} className="text-white" />, 
       color: 'bg-brand-info',
       subtitle: `de ${totalCapacity.toLocaleString('pt-BR')} vagas`,
       onClick: () => onNavigate('grading_management')
@@ -35,7 +36,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
     { 
       title: 'Matrículas Pendentes', 
       value: pendingEnrollments.toString(), 
-      icon: '📝', 
+      icon: <FileText size={24} className="text-white" />, 
       color: 'bg-brand-warning',
       subtitle: 'aguardando análise',
       onClick: () => onNavigate('enrollment_manager')
@@ -43,7 +44,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
     { 
       title: 'Escolas Ativas', 
       value: filteredSchools.length.toString(), 
-      icon: '🏫', 
+      icon: <Building2 size={24} className="text-white" />, 
       color: 'bg-brand-success',
       subtitle: 'em funcionamento',
       onClick: undefined
@@ -51,22 +52,31 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
     { 
       title: 'Rotas de Transporte', 
       value: activeRoutes.toString(), 
-      icon: '🚌', 
-      color: 'bg-brand-yellow',
+      icon: <Bus size={24} className="text-brand-dark" />, 
+      color: 'bg-brand-primary',
       subtitle: 'rotas ativas',
       onClick: () => onNavigate('transport')
     },
   ];
 
+  const quickActions = [
+    { label: 'Nova Matrícula', icon: <PlusCircle size={28} />, action: () => onNavigate('enrollment_manager') },
+    { label: 'Lançar Notas', icon: <BarChart3 size={28} />, action: () => onNavigate('grading_management') },
+    { label: 'Ver Calendário', icon: <Calendar size={28} />, action: () => onNavigate('calendar_letivo') },
+    { label: 'Relatório de Auditoria', icon: <Shield size={28} />, action: () => onNavigate('audit') },
+  ];
+
+  const canSelectSchool = userRole === UserRole.SUPER_ADM || userRole === UserRole.DIRETORIA;
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header */}
+      {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-black text-brand-dark tracking-tight">Dashboard</h1>
-          <p className="text-brand-gray mt-1">Visão geral da rede municipal de ensino</p>
+          <h1 className="text-4xl font-black text-brand-dark tracking-tight">Painel</h1>
+          <p className="text-brand-muted mt-1">Visão geral da rede municipal de ensino</p>
         </div>
-        {userRole === UserRole.ADMIN && (
+        {canSelectSchool && (
           <SchoolSelector 
             selectedSchoolId={selectedSchoolId} 
             onSchoolChange={onSchoolChange}
@@ -74,7 +84,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
         )}
       </div>
 
-      {/* Stats Cards */}
+      {/* Cards de Estatísticas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, index) => (
           <div
@@ -84,11 +94,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
           >
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-brand-gray text-xs font-bold uppercase tracking-widest">{stat.title}</p>
+                <p className="text-brand-muted text-xs font-bold uppercase tracking-widest">{stat.title}</p>
                 <p className="text-4xl font-black text-brand-dark mt-2">{stat.value}</p>
-                <p className="text-brand-gray text-sm mt-1">{stat.subtitle}</p>
+                <p className="text-brand-muted text-sm mt-1">{stat.subtitle}</p>
               </div>
-              <div className={`w-14 h-14 ${stat.color} rounded-2xl flex items-center justify-center text-2xl shadow-lg`}>
+              <div className={`w-14 h-14 ${stat.color} rounded-2xl flex items-center justify-center shadow-lg`}>
                 {stat.icon}
               </div>
             </div>
@@ -96,29 +106,24 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
         ))}
       </div>
 
-      {/* Quick Actions */}
+      {/* Ações Rápidas */}
       <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
         <h2 className="text-xl font-black text-brand-dark mb-6">Ações Rápidas</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { label: 'Nova Matrícula', icon: '➕', action: () => onNavigate('enrollment_manager') },
-            { label: 'Lançar Notas', icon: '📊', action: () => onNavigate('grading_management') },
-            { label: 'Ver Calendário', icon: '📅', action: () => onNavigate('calendar_letivo') },
-            { label: 'Relatório de Auditoria', icon: '🔒', action: () => onNavigate('audit') },
-          ].map((item, i) => (
+          {quickActions.map((item, i) => (
             <button
               key={i}
               onClick={item.action}
-              className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gray-50 hover:bg-brand-yellow/10 hover:border-brand-yellow border-2 border-transparent transition-all"
+              className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-gray-50 hover:bg-brand-primary/10 hover:border-brand-primary border-2 border-transparent transition-all text-brand-dark"
             >
-              <span className="text-3xl">{item.icon}</span>
-              <span className="text-sm font-bold text-brand-dark">{item.label}</span>
+              {item.icon}
+              <span className="text-sm font-bold">{item.label}</span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Schools Overview */}
+      {/* Visão Geral das Escolas */}
       <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100">
         <h2 className="text-xl font-black text-brand-dark mb-6">Escolas da Rede</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -129,7 +134,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-black text-brand-dark">{school.name}</h3>
-                    <p className="text-brand-gray text-sm mt-1">{school.address}</p>
+                    <p className="text-brand-muted text-sm mt-1">{school.address}</p>
                     <div className="flex flex-wrap gap-2 mt-3">
                       {school.levels?.map((level, i) => (
                         <span key={i} className="px-3 py-1 bg-brand-info/10 text-brand-info text-[10px] font-bold uppercase rounded-full">
@@ -140,12 +145,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onNavigate, selectedSchoolId, onS
                   </div>
                   <div className="text-right">
                     <p className="text-3xl font-black text-brand-dark">{school.students}</p>
-                    <p className="text-brand-gray text-xs">alunos</p>
+                    <p className="text-brand-muted text-xs">alunos</p>
                   </div>
                 </div>
                 <div className="mt-4">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-brand-gray">Ocupação</span>
+                    <span className="text-brand-muted">Ocupação</span>
                     <span className="font-bold text-brand-dark">{occupancy}%</span>
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">

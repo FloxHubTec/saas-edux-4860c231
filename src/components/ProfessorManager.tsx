@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Professor } from '../types';
 import { MOCK_PROFESSORS, MOCK_SCHOOLS, SUBJECTS_LIST } from '../constants';
 import { auditService } from '../services/auditService';
+import { Plus, Search, Users, UserCheck, UserX, BookOpen, Edit2, UserCog } from 'lucide-react';
 
 interface ProfessorManagerProps {
   currentUser: User;
@@ -86,49 +87,54 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
     auditService.log(currentUser, 'Alteração de Status de Professor', 'Professor', professor.id, professor.status, newStatus, `Status de ${professor.name} alterado para ${newStatus}`);
   };
 
+  const stats = [
+    { label: 'Total', value: professors.length, icon: <Users size={20} className="text-white" />, color: 'bg-brand-dark' },
+    { label: 'Ativos', value: professors.filter(p => p.status === 'active').length, icon: <UserCheck size={20} className="text-white" />, color: 'bg-brand-success' },
+    { label: 'Inativos', value: professors.filter(p => p.status === 'inactive').length, icon: <UserX size={20} className="text-white" />, color: 'bg-brand-danger' },
+    { label: 'Disciplinas', value: [...new Set(professors.flatMap(p => p.subjects))].length, icon: <BookOpen size={20} className="text-white" />, color: 'bg-brand-info' },
+  ];
+
   return (
     <div className="space-y-8 animate-fade-in">
-      {/* Header */}
+      {/* Cabeçalho */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-black text-brand-dark tracking-tight">Gestão de Professores</h1>
-          <p className="text-brand-gray mt-1">Cadastre e gerencie o corpo docente</p>
+          <p className="text-brand-muted mt-1">Cadastre e gerencie o corpo docente</p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="px-6 py-3 bg-brand-yellow text-brand-dark rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg shadow-brand-yellow/20"
+          className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-brand-dark rounded-2xl font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-all shadow-lg"
         >
-          ➕ Novo Professor
+          <Plus size={18} />
+          Novo Professor
         </button>
       </div>
 
-      {/* Stats */}
+      {/* Estatísticas */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: 'Total', value: professors.length, color: 'bg-brand-dark' },
-          { label: 'Ativos', value: professors.filter(p => p.status === 'active').length, color: 'bg-brand-success' },
-          { label: 'Inativos', value: professors.filter(p => p.status === 'inactive').length, color: 'bg-brand-danger' },
-          { label: 'Disciplinas', value: [...new Set(professors.flatMap(p => p.subjects))].length, color: 'bg-brand-info' },
-        ].map((stat, i) => (
+        {stats.map((stat, i) => (
           <div key={i} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className={`w-10 h-10 ${stat.color} rounded-xl flex items-center justify-center text-white font-bold text-lg mb-3`}>
-              {stat.value}
+            <div className={`w-10 h-10 ${stat.color} rounded-xl flex items-center justify-center mb-3`}>
+              {stat.icon}
             </div>
-            <p className="text-brand-gray text-xs font-bold uppercase tracking-widest">{stat.label}</p>
+            <p className="text-3xl font-black text-brand-dark">{stat.value}</p>
+            <p className="text-brand-muted text-xs font-bold uppercase tracking-widest">{stat.label}</p>
           </div>
         ))}
       </div>
 
-      {/* Filters */}
+      {/* Filtros */}
       <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+          <div className="flex-1 relative">
+            <Search size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-muted" />
             <input
               type="text"
-              placeholder="🔍 Buscar por nome ou email..."
+              placeholder="Buscar por nome ou email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
+              className="w-full pl-12 pr-5 py-4 border-2 border-gray-100 rounded-2xl text-brand-dark font-medium focus:outline-none focus:border-brand-primary transition-all"
             />
           </div>
           <div className="flex gap-2">
@@ -138,8 +144,8 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
                 onClick={() => setStatusFilter(status)}
                 className={`px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
                   statusFilter === status
-                    ? 'bg-brand-yellow text-brand-dark'
-                    : 'bg-gray-50 text-brand-gray hover:bg-gray-100'
+                    ? 'bg-brand-primary text-brand-dark'
+                    : 'bg-gray-50 text-brand-muted hover:bg-gray-100'
                 }`}
               >
                 {status === 'all' ? 'Todos' : status === 'active' ? 'Ativos' : 'Inativos'}
@@ -149,13 +155,13 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
         </div>
       </div>
 
-      {/* Professors Grid */}
+      {/* Grid de Professores */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProfessors.map((professor) => (
           <div key={professor.id} className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all">
             <div className="flex justify-between items-start mb-4">
-              <div className="w-14 h-14 bg-brand-info/10 rounded-2xl flex items-center justify-center text-2xl">
-                👨‍🏫
+              <div className="w-14 h-14 bg-brand-info/10 rounded-2xl flex items-center justify-center">
+                <UserCog size={24} className="text-brand-info" />
               </div>
               <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                 professor.status === 'active' ? 'bg-brand-success/10 text-brand-success' : 'bg-brand-danger/10 text-brand-danger'
@@ -165,10 +171,10 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
             </div>
             
             <h3 className="font-black text-brand-dark text-lg">{professor.name}</h3>
-            <p className="text-brand-gray text-sm mt-1">{professor.email}</p>
+            <p className="text-brand-muted text-sm mt-1">{professor.email}</p>
             
             <div className="mt-4">
-              <p className="text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Disciplinas</p>
+              <p className="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Disciplinas</p>
               <div className="flex flex-wrap gap-1">
                 {professor.subjects.map((subject, i) => (
                   <span key={i} className="px-2 py-1 bg-brand-info/10 text-brand-info rounded text-xs font-bold">
@@ -179,7 +185,7 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
             </div>
             
             <div className="mt-4">
-              <p className="text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Escolas</p>
+              <p className="text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Escolas</p>
               <div className="flex flex-wrap gap-1">
                 {professor.schoolIds.map((schoolId, i) => {
                   const school = MOCK_SCHOOLS.find(s => s.id === schoolId);
@@ -195,8 +201,9 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
             <div className="mt-6 flex gap-2">
               <button
                 onClick={() => handleOpenModal(professor)}
-                className="flex-1 px-4 py-2 bg-brand-dark text-white rounded-xl text-xs font-bold hover:bg-black transition-all"
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-brand-dark text-white rounded-xl text-xs font-bold hover:bg-black transition-all"
               >
+                <Edit2 size={14} />
                 Editar
               </button>
               <button
@@ -224,37 +231,37 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
             
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Nome Completo *</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Nome Completo *</label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-yellow transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-primary transition-all"
                 />
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Email *</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Email *</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-yellow transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-primary transition-all"
                 />
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">CPF *</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">CPF *</label>
                 <input
                   type="text"
                   value={formData.cpf}
                   onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-yellow transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-primary transition-all"
                 />
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Disciplinas</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Disciplinas</label>
                 <div className="flex flex-wrap gap-2">
                   {SUBJECTS_LIST.map((subject) => (
                     <button
@@ -271,7 +278,7 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
                       className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
                         formData.subjects.includes(subject)
                           ? 'bg-brand-info text-white'
-                          : 'bg-gray-100 text-brand-gray hover:bg-gray-200'
+                          : 'bg-gray-100 text-brand-muted hover:bg-gray-200'
                       }`}
                     >
                       {subject}
@@ -281,7 +288,7 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Escolas</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Escolas</label>
                 <div className="flex flex-wrap gap-2">
                   {MOCK_SCHOOLS.map((school) => (
                     <button
@@ -298,7 +305,7 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
                       className={`px-3 py-2 rounded-lg text-xs font-bold transition-all ${
                         formData.schoolIds.includes(school.id)
                           ? 'bg-brand-warning text-white'
-                          : 'bg-gray-100 text-brand-gray hover:bg-gray-200'
+                          : 'bg-gray-100 text-brand-muted hover:bg-gray-200'
                       }`}
                     >
                       {school.name.split(' ').slice(0, 2).join(' ')}
@@ -308,12 +315,12 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Turmas (separadas por vírgula)</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Turmas (separadas por vírgula)</label>
                 <input
                   type="text"
                   value={formData.classes}
                   onChange={(e) => setFormData({ ...formData, classes: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-yellow transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-primary transition-all"
                   placeholder="4º Ano A, 5º Ano B"
                 />
               </div>
@@ -322,7 +329,7 @@ const ProfessorManager: React.FC<ProfessorManagerProps> = ({ currentUser }) => {
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowModal(false)}
-                className="flex-1 px-6 py-3 bg-gray-100 text-brand-gray rounded-xl font-bold text-sm hover:bg-gray-200 transition-all"
+                className="flex-1 px-6 py-3 bg-gray-100 text-brand-muted rounded-xl font-bold text-sm hover:bg-gray-200 transition-all"
               >
                 Cancelar
               </button>

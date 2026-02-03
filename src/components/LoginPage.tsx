@@ -1,233 +1,121 @@
 import React, { useState } from 'react';
-import { User, UserRole } from '../types';
-import { MOCK_SCHOOLS, MOCK_PROFESSORS } from '../constants';
+import { User, UserRole, UserRoleLabels } from '../types';
+import { Building2, LogIn, ChevronDown, Crown, ClipboardList, Users, GraduationCap, BookOpen, UserCheck, Briefcase } from 'lucide-react';
 
 interface LoginPageProps {
   onLogin: (user: User) => void;
 }
 
-const DEMO_USERS = [
-  { id: 'admin-01', name: 'João Administrador', email: 'admin@edu.gov', role: UserRole.ADMIN, schoolId: undefined },
-  { id: 'sec-01', name: 'Maria Secretária', email: 'secretaria@edu.gov', role: UserRole.SECRETARY, schoolId: 'escola-01' },
-  { id: 'prof-01', name: 'Carla Mendes', email: 'carla.mendes@edu.gov', role: UserRole.PROFESSOR, schoolId: 'escola-01' },
-  { id: 'stu-01', name: 'Ana Clara Oliveira', email: 'ana.clara@aluno.edu.gov', role: UserRole.STUDENT, schoolId: 'escola-01' },
+const DEMO_USERS: { role: UserRole; name: string; email: string; schoolId?: string; icon: React.ReactNode }[] = [
+  { role: UserRole.SUPER_ADM, name: 'Administrador do Sistema', email: 'superadm@edux.com', icon: <Crown size={18} /> },
+  { role: UserRole.DIRETORIA, name: 'Maria Silva', email: 'diretoria@emjbs.edu.br', schoolId: 'school-01', icon: <Briefcase size={18} /> },
+  { role: UserRole.COORDENADOR, name: 'Carlos Souza', email: 'coordenador@emjbs.edu.br', schoolId: 'school-01', icon: <ClipboardList size={18} /> },
+  { role: UserRole.PROFESSOR, name: 'Ana Costa', email: 'ana.costa@emjbs.edu.br', schoolId: 'school-01', icon: <BookOpen size={18} /> },
+  { role: UserRole.SECRETARIO, name: 'Paula Santos', email: 'secretaria@emjbs.edu.br', schoolId: 'school-01', icon: <Users size={18} /> },
+  { role: UserRole.ALUNO, name: 'João Pedro', email: 'joao.pedro@aluno.edu.br', schoolId: 'school-01', icon: <GraduationCap size={18} /> },
+  { role: UserRole.RESPONSAVEL, name: 'Roberto Almeida', email: 'roberto.almeida@email.com', schoolId: 'school-01', icon: <UserCheck size={18} /> },
 ];
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isNewUser, setIsNewUser] = useState(false);
-  const [newUserData, setNewUserData] = useState({ name: '', email: '', phone: '' });
+  const [selectedRole, setSelectedRole] = useState<UserRole | ''>('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const user = DEMO_USERS.find(u => u.email === email);
-    if (user) {
-      onLogin(user);
-    } else {
-      setError('Usuário não encontrado. Use um dos emails de demonstração.');
+  const handleLogin = () => {
+    if (!selectedRole) return;
+    const demoUser = DEMO_USERS.find(u => u.role === selectedRole);
+    if (demoUser) {
+      onLogin({
+        id: `user-${selectedRole.toLowerCase()}`,
+        name: demoUser.name,
+        email: demoUser.email,
+        role: selectedRole,
+        schoolId: demoUser.schoolId,
+      });
     }
   };
 
-  const handleSelfRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newUserData.name && newUserData.email) {
-      const newUser: User = {
-        id: `self-${Date.now()}`,
-        name: newUserData.name,
-        email: newUserData.email,
-        role: UserRole.STUDENT,
-        isSelfRegistered: true
-      };
-      onLogin(newUser);
-    }
-  };
-
-  const handleDemoLogin = (user: typeof DEMO_USERS[0]) => {
-    onLogin(user);
-  };
+  const selectedUser = DEMO_USERS.find(u => u.role === selectedRole);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-brand-dark via-brand-dark to-brand-dark/90 flex items-center justify-center p-4">
-      <div className="max-w-6xl w-full grid md:grid-cols-2 gap-8 items-center">
-        {/* Left Side - Branding */}
-        <div className="text-white space-y-8 text-center md:text-left">
-          <div>
-            <div className="inline-flex items-center gap-4 mb-6">
-              <div className="w-20 h-20 bg-brand-yellow rounded-3xl flex items-center justify-center text-brand-dark font-black text-4xl shadow-2xl shadow-brand-yellow/30">
-                E
-              </div>
-              <div>
-                <h1 className="text-5xl font-black tracking-tight">EduX</h1>
-                <p className="text-brand-yellow font-bold text-sm uppercase tracking-widest">Sistema de Gestão Educacional</p>
-              </div>
-            </div>
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 bg-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-2xl shadow-brand-primary/30">
+            <Building2 size={40} className="text-brand-dark" />
           </div>
-          
-          <div className="space-y-4">
-            <h2 className="text-3xl font-black leading-tight">
-              Gestão Educacional<br />
-              <span className="text-brand-yellow">Inteligente e Integrada</span>
-            </h2>
-            <p className="text-gray-400 text-lg max-w-md">
-              Plataforma completa para administração escolar municipal com conformidade total à Lei 14.133/2021.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 max-w-md">
-            {[
-              { icon: '📊', label: 'Dashboard Analítico' },
-              { icon: '📝', label: 'Matrículas Online' },
-              { icon: '🚌', label: 'Transporte Escolar' },
-              { icon: '🔒', label: 'Auditoria Completa' },
-            ].map((feature, i) => (
-              <div key={i} className="bg-white/5 rounded-2xl p-4 flex items-center gap-3">
-                <span className="text-2xl">{feature.icon}</span>
-                <span className="text-sm font-medium">{feature.label}</span>
-              </div>
-            ))}
-          </div>
+          <h1 className="text-4xl font-black text-white tracking-tight">EduX</h1>
+          <p className="text-brand-muted mt-2">Sistema de Gestão Educacional</p>
         </div>
 
-        {/* Right Side - Login Form */}
-        <div className="bg-white rounded-[2.5rem] p-10 shadow-2xl">
-          {!isNewUser ? (
-            <>
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-black text-brand-dark">Bem-vindo de volta!</h3>
-                <p className="text-brand-gray mt-2">Acesse sua conta para continuar</p>
+        {/* Card de Login */}
+        <div className="bg-white rounded-3xl p-8 shadow-2xl">
+          <h2 className="text-2xl font-bold text-brand-dark mb-2">Bem-vindo</h2>
+          <p className="text-brand-muted mb-6">Selecione seu perfil para acessar o sistema</p>
+
+          {/* Dropdown de Seleção */}
+          <div className="relative mb-6">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl text-left flex items-center justify-between hover:border-brand-primary transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                {selectedUser && <span className="text-brand-dark">{selectedUser.icon}</span>}
+                <span className={selectedRole ? 'text-brand-dark font-medium' : 'text-brand-muted'}>
+                  {selectedRole ? UserRoleLabels[selectedRole] : 'Selecione o perfil de acesso'}
+                </span>
               </div>
+              <ChevronDown size={20} className={`text-brand-muted transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
 
-              <form onSubmit={handleLogin} className="space-y-6">
-                <div>
-                  <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => { setEmail(e.target.value); setError(''); }}
-                    className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
-                    placeholder="seu@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Senha</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
-                    placeholder="••••••••"
-                  />
-                </div>
-
-                {error && (
-                  <div className="bg-brand-danger/10 text-brand-danger px-4 py-3 rounded-xl text-sm font-medium">
-                    {error}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="w-full bg-brand-dark text-white py-4 rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-black transition-all shadow-lg shadow-brand-dark/20"
-                >
-                  Entrar
-                </button>
-              </form>
-
-              <div className="mt-8 pt-8 border-t border-gray-100">
-                <p className="text-center text-xs font-bold text-brand-gray uppercase tracking-widest mb-4">Acesso Rápido (Demo)</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {DEMO_USERS.map((user) => (
-                    <button
-                      key={user.id}
-                      onClick={() => handleDemoLogin(user)}
-                      className="px-4 py-3 bg-gray-50 hover:bg-brand-yellow/10 rounded-xl text-xs font-bold text-brand-dark transition-all flex items-center gap-2"
-                    >
-                      <span className="text-lg">
-                        {user.role === UserRole.ADMIN ? '👑' : 
-                         user.role === UserRole.SECRETARY ? '📋' :
-                         user.role === UserRole.PROFESSOR ? '👨‍🏫' : '🎓'}
-                      </span>
-                      <span className="truncate">{user.name.split(' ')[0]}</span>
-                    </button>
-                  ))}
-                </div>
+            {isDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-xl z-10 overflow-hidden max-h-80 overflow-y-auto">
+                {DEMO_USERS.map((user) => (
+                  <button
+                    key={user.role}
+                    onClick={() => {
+                      setSelectedRole(user.role);
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 text-left hover:bg-brand-light transition-colors flex items-center gap-3 ${
+                      selectedRole === user.role ? 'bg-brand-primary/10 text-brand-dark font-medium' : 'text-brand-dark'
+                    }`}
+                  >
+                    <span className="text-brand-muted">{user.icon}</span>
+                    <div>
+                      <span className="font-medium">{UserRoleLabels[user.role]}</span>
+                      <span className="text-sm text-brand-muted ml-2">({user.name})</span>
+                    </div>
+                  </button>
+                ))}
               </div>
+            )}
+          </div>
 
-              <div className="mt-6 text-center">
-                <button
-                  onClick={() => setIsNewUser(true)}
-                  className="text-brand-info font-bold text-sm hover:underline"
-                >
-                  Primeira vez? Cadastre-se para matrícula →
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-black text-brand-dark">Pré-Cadastro</h3>
-                <p className="text-brand-gray mt-2">Inicie sua solicitação de matrícula</p>
-              </div>
+          {/* Botão de Login */}
+          <button
+            onClick={handleLogin}
+            disabled={!selectedRole}
+            className={`w-full py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-all ${
+              selectedRole
+                ? 'bg-brand-dark text-white hover:bg-brand-dark/90 shadow-lg hover:shadow-xl'
+                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            <LogIn size={20} />
+            Entrar no Sistema
+          </button>
 
-              <form onSubmit={handleSelfRegister} className="space-y-6">
-                <div>
-                  <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Nome Completo</label>
-                  <input
-                    type="text"
-                    value={newUserData.name}
-                    onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
-                    className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
-                    placeholder="Nome do responsável"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={newUserData.email}
-                    onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
-                    className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
-                    placeholder="seu@email.com"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Telefone</label>
-                  <input
-                    type="tel"
-                    value={newUserData.phone}
-                    onChange={(e) => setNewUserData({ ...newUserData, phone: e.target.value })}
-                    className="w-full px-5 py-4 border-2 border-gray-100 rounded-2xl text-brand-dark font-medium focus:outline-none focus:border-brand-yellow transition-all"
-                    placeholder="(00) 00000-0000"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full bg-brand-yellow text-brand-dark py-4 rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg shadow-brand-yellow/20"
-                >
-                  Iniciar Solicitação de Matrícula
-                </button>
-              </form>
-
-              <div className="mt-6 text-center">
-                <button
-                  onClick={() => setIsNewUser(false)}
-                  className="text-brand-gray font-bold text-sm hover:underline"
-                >
-                  ← Voltar ao login
-                </button>
-              </div>
-            </>
-          )}
+          {/* Informação */}
+          <p className="text-center text-sm text-brand-muted mt-6">
+            Ambiente de demonstração
+          </p>
         </div>
+
+        {/* Rodapé */}
+        <p className="text-center text-brand-muted/60 text-sm mt-8">
+          EduX Sistema de Gestão Educacional
+        </p>
       </div>
     </div>
   );
