@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { User, CalendarEvent } from '../types';
 import { MOCK_CALENDAR_EVENTS, MOCK_SCHOOLS } from '../constants';
+import { Plus, ChevronLeft, ChevronRight, Calendar, Clock, Flag, Users } from 'lucide-react';
 
 interface InteractiveCalendarProps {
   currentUser: User;
@@ -76,12 +77,10 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
   const renderCalendarDays = () => {
     const days = [];
     
-    // Empty cells for days before the first day of month
     for (let i = 0; i < startingDayOfWeek; i++) {
       days.push(<div key={`empty-${i}`} className="h-24" />);
     }
 
-    // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const dayEvents = getEventsForDate(date);
@@ -92,11 +91,11 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
         <div
           key={day}
           onClick={() => setSelectedDate(date)}
-          className={`h-24 p-2 border border-gray-100 rounded-xl cursor-pointer transition-all hover:border-brand-yellow ${
-            isToday ? 'bg-brand-yellow/10 border-brand-yellow' : ''
+          className={`h-24 p-2 border border-gray-100 rounded-xl cursor-pointer transition-all hover:border-brand-primary ${
+            isToday ? 'bg-brand-primary/10 border-brand-primary' : ''
           } ${isSelected ? 'ring-2 ring-brand-dark' : ''}`}
         >
-          <span className={`text-sm font-bold ${isToday ? 'text-brand-dark' : 'text-brand-gray'}`}>
+          <span className={`text-sm font-bold ${isToday ? 'text-brand-dark' : 'text-brand-muted'}`}>
             {day}
           </span>
           <div className="mt-1 space-y-1">
@@ -110,7 +109,7 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
               </div>
             ))}
             {dayEvents.length > 2 && (
-              <div className="text-[10px] text-brand-gray font-bold">
+              <div className="text-[10px] text-brand-muted font-bold">
                 +{dayEvents.length - 2} mais
               </div>
             )}
@@ -130,13 +129,14 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-black text-brand-dark tracking-tight">Calendário Letivo</h1>
-          <p className="text-brand-gray mt-1">Gerencie eventos e datas importantes do ano escolar</p>
+          <p className="text-brand-muted mt-1">Gerencie eventos e datas importantes do ano escolar</p>
         </div>
         <button 
           onClick={() => { setShowAddModal(true); }}
-          className="px-6 py-3 bg-brand-yellow text-brand-dark rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg shadow-brand-yellow/20"
+          className="flex items-center gap-2 px-6 py-3 bg-brand-primary text-brand-dark rounded-2xl font-bold text-sm uppercase tracking-widest hover:bg-yellow-400 transition-all shadow-lg shadow-brand-primary/20"
         >
-          ➕ Novo Evento
+          <Plus size={16} />
+          Novo Evento
         </button>
       </div>
 
@@ -149,7 +149,7 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
               onClick={handlePrevMonth}
               className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all"
             >
-              ←
+              <ChevronLeft size={20} />
             </button>
             <h2 className="text-xl font-black text-brand-dark">
               {MONTHS[month]} {year}
@@ -158,14 +158,14 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
               onClick={handleNextMonth}
               className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center hover:bg-gray-200 transition-all"
             >
-              →
+              <ChevronRight size={20} />
             </button>
           </div>
 
           {/* Weekday Headers */}
           <div className="grid grid-cols-7 gap-2 mb-2">
             {WEEKDAYS.map((day) => (
-              <div key={day} className="text-center text-xs font-bold text-brand-gray uppercase tracking-widest py-2">
+              <div key={day} className="text-center text-xs font-bold text-brand-muted uppercase tracking-widest py-2">
                 {day}
               </div>
             ))}
@@ -190,7 +190,7 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
             {selectedDate && (
               <>
                 {selectedDateEvents.length === 0 ? (
-                  <p className="text-brand-gray text-sm">Nenhum evento nesta data</p>
+                  <p className="text-brand-muted text-sm">Nenhum evento nesta data</p>
                 ) : (
                   <div className="space-y-3">
                     {selectedDateEvents.map((evt) => (
@@ -212,14 +212,16 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
             <h3 className="text-sm font-black text-brand-dark mb-4 uppercase tracking-widest">Legenda</h3>
             <div className="space-y-2">
               {[
-                { type: 'holiday', label: 'Feriado/Recesso' },
-                { type: 'event', label: 'Evento' },
-                { type: 'meeting', label: 'Reunião' },
-                { type: 'deadline', label: 'Prazo' },
+                { type: 'holiday', label: 'Feriado/Recesso', icon: Calendar },
+                { type: 'event', label: 'Evento', icon: Flag },
+                { type: 'meeting', label: 'Reunião', icon: Users },
+                { type: 'deadline', label: 'Prazo', icon: Clock },
               ].map((item) => (
                 <div key={item.type} className="flex items-center gap-2">
-                  <span className={`w-4 h-4 rounded ${getEventTypeStyle(item.type as CalendarEvent['type'])}`} />
-                  <span className="text-sm text-brand-gray">{item.label}</span>
+                  <span className={`w-4 h-4 rounded flex items-center justify-center ${getEventTypeStyle(item.type as CalendarEvent['type'])}`}>
+                    <item.icon size={10} />
+                  </span>
+                  <span className="text-sm text-brand-muted">{item.label}</span>
                 </div>
               ))}
             </div>
@@ -239,7 +241,7 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
                       <p className="text-lg font-black text-brand-dark">
                         {new Date(evt.date).getDate()}
                       </p>
-                      <p className="text-xs text-brand-gray">
+                      <p className="text-xs text-brand-muted">
                         {MONTHS[new Date(evt.date).getMonth()].slice(0, 3)}
                       </p>
                     </div>
@@ -266,29 +268,29 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
             
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Data Selecionada</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Data Selecionada</label>
                 <p className="text-brand-dark font-bold">
                   {selectedDate ? selectedDate.toLocaleDateString('pt-BR') : 'Selecione uma data no calendário'}
                 </p>
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Título *</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Título *</label>
                 <input
                   type="text"
                   value={newEvent.title}
                   onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-yellow transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-primary transition-all"
                   placeholder="Nome do evento"
                 />
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Tipo</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Tipo</label>
                 <select
                   value={newEvent.type}
                   onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value as CalendarEvent['type'] })}
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-yellow transition-all"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-primary transition-all"
                 >
                   <option value="event">Evento</option>
                   <option value="holiday">Feriado/Recesso</option>
@@ -298,12 +300,12 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
               </div>
               
               <div>
-                <label className="block text-xs font-bold text-brand-gray uppercase tracking-widest mb-2">Descrição</label>
+                <label className="block text-xs font-bold text-brand-muted uppercase tracking-widest mb-2">Descrição</label>
                 <textarea
                   value={newEvent.description}
                   onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-yellow transition-all resize-none"
+                  className="w-full px-4 py-3 border-2 border-gray-100 rounded-xl focus:outline-none focus:border-brand-primary transition-all resize-none"
                   placeholder="Detalhes do evento..."
                 />
               </div>
@@ -312,7 +314,7 @@ const InteractiveCalendar: React.FC<InteractiveCalendarProps> = ({ currentUser, 
             <div className="flex gap-3 mt-8">
               <button
                 onClick={() => setShowAddModal(false)}
-                className="flex-1 px-6 py-3 bg-gray-100 text-brand-gray rounded-xl font-bold text-sm hover:bg-gray-200 transition-all"
+                className="flex-1 px-6 py-3 bg-gray-100 text-brand-muted rounded-xl font-bold text-sm hover:bg-gray-200 transition-all"
               >
                 Cancelar
               </button>
