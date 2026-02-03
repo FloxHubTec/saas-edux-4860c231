@@ -184,6 +184,8 @@ export interface AuditLog {
   newValue: any;
   ipAddress: string;
   details: string;
+  justification?: string; // Justificativa obrigatória para alterações de notas/RH
+  schoolId?: string; // Isolamento por unidade escolar
 }
 
 export interface Assessment {

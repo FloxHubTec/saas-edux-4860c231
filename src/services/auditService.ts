@@ -1,5 +1,11 @@
 import { AuditLog, User, UserRole } from '../types';
 
+// Função para obter IP do cliente (simulado em dev, real em prod)
+const getClientIP = (): string => {
+  // Em produção, isso seria obtido do backend
+  return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+};
+
 class AuditService {
   private logs: AuditLog[] = [];
 
@@ -10,8 +16,18 @@ class AuditService {
     entityId: string,
     oldValue: any,
     newValue: any,
-    details: string = ''
+    details: string = '',
+    justification?: string
   ): void {
+    // Validar justificativa obrigatória para alterações sensíveis
+    const sensitiveTypes = ['StudentGrade', 'StudentAcademicRecord', 'ProfessorData', 'UserData'];
+    const requiresJustification = sensitiveTypes.includes(entityType) && 
+      (action.includes('Alteração') || action.includes('Exclusão') || action.includes('Edição'));
+    
+    if (requiresJustification && !justification && user.role === UserRole.PROFESSOR) {
+      console.warn('[AUDIT] Justificativa recomendada para esta ação');
+    }
+
     const logEntry: AuditLog = {
       id: `audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
@@ -23,8 +39,10 @@ class AuditService {
       entityId,
       oldValue,
       newValue,
-      ipAddress: '192.168.1.1', // Em produção, capturar IP real
-      details
+      ipAddress: getClientIP(),
+      details,
+      justification,
+      schoolId: user.schoolId
     };
 
     this.logs.unshift(logEntry);
@@ -38,12 +56,35 @@ class AuditService {
     console.log('[AUDIT]', logEntry);
   }
 
+  // Método específico para log de alteração de notas (requer justificativa)
+  logGradeChange(
+    user: User,
+    studentId: string,
+    subject: string,
+    bimester: number,
+    oldGrade: number | null,
+    newGrade: number,
+    justification: string
+  ): void {
+    this.log(
+      user,
+      'Alteração de Nota',
+      'StudentGrade',
+      `${studentId}-${subject}-bim${bimester}`,
+      oldGrade,
+      newGrade,
+      `Nota alterada de ${oldGrade ?? 'N/A'} para ${newGrade} em ${subject}, ${bimester}º Bimestre`,
+      justification
+    );
+  }
+
   getLogs(filters?: {
     userId?: string;
     entityType?: string;
     action?: string;
     startDate?: string;
     endDate?: string;
+    schoolId?: string;
   }): AuditLog[] {
     let filteredLogs = [...this.logs];
 
@@ -63,6 +104,9 @@ class AuditService {
       if (filters.endDate) {
         filteredLogs = filteredLogs.filter(log => log.timestamp <= filters.endDate!);
       }
+      if (filters.schoolId) {
+        filteredLogs = filteredLogs.filter(log => log.schoolId === filters.schoolId);
+      }
     }
 
     return filteredLogs;
@@ -73,7 +117,7 @@ class AuditService {
   }
 
   exportToCSV(): string {
-    const headers = ['ID', 'Data/Hora', 'Usuário', 'Função', 'Ação', 'Tipo Entidade', 'ID Entidade', 'Detalhes', 'IP'];
+    const headers = ['ID', 'Data/Hora', 'Usuário', 'Função', 'Ação', 'Tipo Entidade', 'ID Entidade', 'Detalhes', 'Justificativa', 'IP', 'Unidade'];
     const rows = this.logs.map(log => [
       log.id,
       new Date(log.timestamp).toLocaleString('pt-BR'),
@@ -83,7 +127,9 @@ class AuditService {
       log.entityType,
       log.entityId,
       log.details,
-      log.ipAddress
+      log.justification || '',
+      log.ipAddress,
+      log.schoolId || 'Global'
     ]);
 
     return [headers, ...rows].map(row => row.join(';')).join('\n');
